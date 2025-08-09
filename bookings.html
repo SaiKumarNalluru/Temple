@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Bookings • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">My Bookings</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/temples.html">Temples</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <h2>Booking History</h2>
+      <div id="bookingHistory" class="list"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      App.requireRole('user');
+
+      function renderHistory() {
+        const user = App.getCurrentUser();
+        const bookings = App.getBookings().filter(b => b.userId === user.id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+        const temples = App.getTemples();
+        const services = App.getServices();
+        const container = document.getElementById('bookingHistory');
+        if (bookings.length === 0) { container.innerHTML = '<div class="muted">No bookings yet.</div>'; return; }
+        container.innerHTML = bookings.map(b => {
+          const temple = temples.find(t => t.id === b.templeId);
+          const service = services.find(s => s.id === b.serviceId);
+          return `
+            <div class="list-item" data-id="${b.id}">
+              <div>
+                <div><strong>${service ? service.name : 'Service'}</strong> at ${temple ? temple.name : 'Temple'}</div>
+                <div class="small muted">${b.date} • ${b.time} • ₹${service ? service.amount.toFixed(2) : '-'}</div>
+              </div>
+              <div class="actions">
+                <span class="badge">${b.status}</span>
+                <button class="btn btn-ghost" data-action="cancel">Cancel</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('bookingHistory').addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-action="cancel"]');
+        if (!btn) return;
+        const id = btn.closest('.list-item').getAttribute('data-id');
+        if (!confirm('Cancel this booking?')) return;
+        App.saveBookings(App.getBookings().filter(b => b.id !== id));
+        renderHistory();
+      });
+
+      renderHistory();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temple • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Temple Details</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/temples.html">Back to Temples</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <h2 id="templeTitle">Temple</h2>
+      <div class="small muted" id="templeMeta"></div>
+      <p id="templeDesc" class="small"></p>
+    </section>
+
+    <section class="card">
+      <h3>Services</h3>
+      <div id="servicesList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h3>Book a Service</h3>
+      <form id="bookingForm" class="form">
+        <label>Service
+          <select id="bookingService" required>
+            <option value="" disabled selected>Select a service</option>
+          </select>
+        </label>
+        <div class="grid two">
+          <label>Date
+            <input type="date" id="bookingDate" required />
+          </label>
+          <label>Time
+            <input type="time" id="bookingTime" required />
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Book</button>
+      </form>
+      <div class="small muted">Login required to book.</div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      const templeId = App.getQueryParam('id');
+      const temple = App.getTemples().find(t => t.id === templeId);
+      if (!temple) { window.location.href = '/temples.html'; return; }
+
+      function renderTemple() {
+        document.getElementById('templeTitle').textContent = temple.name;
+        document.getElementById('templeMeta').textContent = temple.location;
+        document.getElementById('templeDesc').textContent = temple.description || '';
+      }
+
+      function renderServices() {
+        const list = document.getElementById('servicesList');
+        const select = document.getElementById('bookingService');
+        const services = App.getServices().filter(s => s.templeId === templeId);
+        if (services.length === 0) {
+          list.innerHTML = '<div class="muted">No services available.</div>';
+          select.innerHTML = '<option value="" disabled selected>No services</option>';
+          return;
+        }
+        list.innerHTML = services.map(s => `
+          <div class="service-row"><span>${s.name}</span><span class="price">₹${s.amount.toFixed(2)}</span></div>
+        `).join('');
+        select.innerHTML = '<option value="" disabled selected>Select a service</option>' + services.map(s => `<option value="${s.id}">${s.name} — ₹${s.amount.toFixed(2)}</option>`).join('');
+      }
+
+      function handleBooking(e) {
+        e.preventDefault();
+        const user = App.getCurrentUser();
+        if (!user || user.role !== 'user') return alert('Please login as a user to book.');
+        const serviceId = document.getElementById('bookingService').value;
+        const date = document.getElementById('bookingDate').value;
+        const time = document.getElementById('bookingTime').value;
+        if (!serviceId || !date || !time) return;
+        const bookings = App.getBookings();
+        if (bookings.some(b => b.userId === user.id && b.serviceId === serviceId && b.date === date && b.time === time)) {
+          return alert('You already booked this service at the same time.');
+        }
+        bookings.push({ id: App.uniqueId('booking'), userId: user.id, templeId, serviceId, date, time, status: 'CONFIRMED', createdAt: new Date().toISOString() });
+        App.saveBookings(bookings);
+        alert('Booking confirmed.');
+        window.location.href = '/bookings.html';
+      }
+
+      document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+
+      renderTemple();
+      renderServices();
+    });
+  </script>
+</body>
+</html>

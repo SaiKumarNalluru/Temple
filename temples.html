@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temples • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Find Temples</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+        <a href="/user-login.html">Login</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search by temple or location" />
+        <button id="clearSearchBtn" class="btn btn-secondary">Clear</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Temples</h2>
+      <div id="templeList" class="grid three"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      const listEl = document.getElementById('templeList');
+      let q = '';
+
+      function render() {
+        const temples = App.getTemples().filter(t =>
+          t.name.toLowerCase().includes(q) || t.location.toLowerCase().includes(q)
+        );
+        if (temples.length === 0) {
+          listEl.innerHTML = '<div class="muted">No temples match your search.</div>';
+          return;
+        }
+        listEl.innerHTML = temples.map(t => `
+          <div class="card-item">
+            <h4>${t.name}</h4>
+            <div class="badge">${t.location}</div>
+            <p class="small">${t.description || ''}</p>
+            <a class="btn btn-primary" href="/temple.html?id=${t.id}">Open</a>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('searchInput').addEventListener('input', function (e) {
+        q = e.target.value.trim().toLowerCase();
+        render();
+      });
+      document.getElementById('clearSearchBtn').addEventListener('click', function () {
+        q = ''; const i = document.getElementById('searchInput'); i.value=''; render();
+      });
+
+      render();
+    });
+  </script>
+</body>
+</html>

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="./styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <header class="app-header">
@@ -16,9 +16,14 @@
         <div class="brand-logo" aria-hidden="true">🛕</div>
         <div class="brand-text">
           <div class="brand-title">Temple Services</div>
-          <div class="brand-subtitle">Book services at temples easily</div>
+          <div class="brand-subtitle">Devotional bookings made simple</div>
         </div>
       </div>
+      <nav class="nav">
+        <a href="/temples.html">Temples</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+        <a href="/admin-dashboard.html" data-role="admin-link" class="hidden">Admin</a>
+      </nav>
       <div class="user-actions">
         <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
         <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
@@ -26,119 +31,28 @@
     </div>
   </header>
 
-  <main class="container">
-    <!-- Authentication Section -->
-    <section id="authSection" class="card">
-      <div class="tabs">
-        <button class="tab-button active" data-tab="userAuthPanel" id="userTabBtn">User Login</button>
-        <button class="tab-button" data-tab="adminAuthPanel" id="adminTabBtn">Admin Login</button>
-      </div>
-
-      <div class="tab-panels">
-        <!-- User Auth Panel -->
-        <div id="userAuthPanel" class="tab-panel active">
-          <div class="grid two">
-            <div class="card flat">
-              <h2>User Login</h2>
-              <form id="userLoginForm" class="form" autocomplete="off">
-                <label>Email
-                  <input type="email" id="userLoginEmail" placeholder="you@example.com" required />
-                </label>
-                <label>Password
-                  <input type="password" id="userLoginPassword" placeholder="••••••••" minlength="6" required />
-                </label>
-                <button type="submit" class="btn btn-primary full">Login</button>
-              </form>
-            </div>
-            <div class="card flat">
-              <h2>Create Account</h2>
-              <form id="userRegisterForm" class="form" autocomplete="off">
-                <label>Full Name
-                  <input type="text" id="registerName" placeholder="Your name" required />
-                </label>
-                <label>Email
-                  <input type="email" id="registerEmail" placeholder="you@example.com" required />
-                </label>
-                <label>Password
-                  <input type="password" id="registerPassword" placeholder="Min 6 characters" minlength="6" required />
-                </label>
-                <button type="submit" class="btn btn-secondary full">Create Account</button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <!-- Admin Auth Panel -->
-        <div id="adminAuthPanel" class="tab-panel">
-          <div class="card flat">
-            <h2>Admin Login</h2>
-            <form id="adminLoginForm" class="form" autocomplete="off">
-              <label>Email
-                <input type="email" id="adminLoginEmail" placeholder="admin@temple.com" required />
-              </label>
-              <label>Password
-                <input type="password" id="adminLoginPassword" placeholder="••••••••" minlength="6" required />
-              </label>
-              <button type="submit" class="btn btn-primary full">Login as Admin</button>
-            </form>
-            <p class="muted small">Default admin: admin@temple.com / admin123</p>
-          </div>
-        </div>
-      </div>
+  <main class="container stack">
+    <section class="hero card">
+      <h1 class="hero-title">Experience the Divine, Seamlessly</h1>
+      <p class="hero-subtitle">Search temples, explore services, and book your seva with a few taps.</p>
     </section>
 
-    <!-- Admin Section -->
-    <section id="adminSection" class="stack" hidden>
+    <section class="tiles">
       <div class="card">
-        <h2>Admin Dashboard</h2>
+        <h3>For Devotees</h3>
+        <p class="muted">Search temples, view services and book a time slot. Access your booking history anytime.</p>
         <div class="grid two">
-          <div class="card flat">
-            <h3>Add Temple</h3>
-            <form id="addTempleForm" class="form">
-              <label>Temple Name
-                <input type="text" id="templeName" placeholder="Temple name" required />
-              </label>
-              <label>Location
-                <input type="text" id="templeLocation" placeholder="City, Area" required />
-              </label>
-              <label>Description
-                <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
-              </label>
-              <button type="submit" class="btn btn-primary">Add Temple</button>
-            </form>
-          </div>
-          <div class="card flat">
-            <h3>All Temples</h3>
-            <div id="adminTempleList" class="list"></div>
-          </div>
+          <a class="btn btn-primary" href="/temples.html">Find Temples</a>
+          <a class="btn btn-secondary" href="/user-login.html">Login</a>
         </div>
       </div>
-    </section>
-
-    <!-- User Section -->
-    <section id="userSection" class="stack" hidden>
       <div class="card">
+        <h3>For Admin</h3>
+        <p class="muted">Add temples and define services with amounts. Manage bookings and services.</p>
         <div class="grid two">
-          <div>
-            <h2>Find Temples</h2>
-            <div class="search-bar">
-              <input type="search" id="searchInput" placeholder="Search by temple or location" />
-              <button id="clearSearchBtn" class="btn btn-secondary">Clear</button>
-            </div>
-            <div id="userTempleList" class="grid three responsive-gap"></div>
-          </div>
-          <div>
-            <h2>Temple Details</h2>
-            <div id="templeDetailPanel" class="card flat muted" aria-live="polite">
-              <p>Select a temple to view services and book.</p>
-            </div>
-          </div>
+          <a class="btn btn-primary" href="/admin-login.html">Admin Login</a>
+          <a class="btn btn-secondary" href="/admin-dashboard.html">Dashboard</a>
         </div>
-      </div>
-
-      <div class="card">
-        <h2>My Bookings</h2>
-        <div id="bookingHistory" class="list"></div>
       </div>
     </section>
   </main>
@@ -147,6 +61,6 @@
     <div class="container">© <span id="yearSpan"></span> Temple Services</div>
   </footer>
 
-  <script src="./app.js"></script>
+  <script src="/js/common.js"></script>
 </body>
 </html>

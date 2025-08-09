@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Admin Portal</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/admin-dashboard.html" data-role="admin-link">Dashboard</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <h2>Add Temple</h2>
+      <form id="addTempleForm" class="form">
+        <label>Temple Name
+          <input type="text" id="templeName" placeholder="Temple name" required />
+        </label>
+        <label>Location
+          <input type="text" id="templeLocation" placeholder="City, Area" required />
+        </label>
+        <label>Description
+          <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary">Add Temple</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>All Temples</h2>
+      <div id="adminTempleList" class="list"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      App.requireRole('admin');
+
+      function renderList() {
+        const temples = App.getTemples();
+        const services = App.getServices();
+        const list = document.getElementById('adminTempleList');
+        if (temples.length === 0) {
+          list.innerHTML = '<div class="muted">No temples yet. Add one above.</div>';
+          return;
+        }
+        list.innerHTML = temples.map(t => {
+          const count = services.filter(s => s.templeId === t.id).length;
+          return `
+            <div class="list-item" data-id="${t.id}">
+              <div>
+                <div><strong>${t.name}</strong></div>
+                <div class="small muted">${t.location} • ${count} services</div>
+              </div>
+              <div class="actions">
+                <a class="btn btn-secondary" href="/admin-temple.html?id=${t.id}">Manage</a>
+                <button class="btn btn-danger" data-action="delete">Delete</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('addTempleForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('templeName').value.trim();
+        const location = document.getElementById('templeLocation').value.trim();
+        const description = document.getElementById('templeDescription').value.trim();
+        if (!name || !location) return;
+        const temples = App.getTemples();
+        temples.push({ id: App.uniqueId('temple'), name, location, description });
+        App.saveTemples(temples);
+        e.target.reset();
+        renderList();
+      });
+
+      document.getElementById('adminTempleList').addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-action="delete"]');
+        if (!btn) return;
+        const item = btn.closest('.list-item');
+        const id = item.getAttribute('data-id');
+        if (!confirm('Delete this temple and its services/bookings?')) return;
+        const temples = App.getTemples().filter(t => t.id !== id);
+        App.saveTemples(temples);
+        App.saveServices(App.getServices().filter(s => s.templeId !== id));
+        App.saveBookings(App.getBookings().filter(b => b.templeId !== id));
+        renderList();
+      });
+
+      renderList();
+    });
+  </script>
+</body>
+</html>
