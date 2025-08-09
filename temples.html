@@ -67,6 +67,7 @@
             ${t.images && t.images[0] ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : ''}
             <h4>${t.name}</h4>
             <div class="badge">${t.location}</div>
+            ${t.timings ? `<div class="small muted">🕒 ${t.timings}</div>` : ''}
             <p class="small">${t.description || ''}</p>
             <div class="contact small">
               ${t.phone ? `<div class="badge">📞 ${t.phone}</div>` : ''}

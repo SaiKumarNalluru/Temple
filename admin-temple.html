@@ -35,6 +35,9 @@
       <hr class="sep"/>
       <h3>Edit Details</h3>
       <form id="editTempleForm" class="form">
+        <label>Timings
+          <input type="text" id="editTimings" placeholder="e.g., 5:00 AM – 9:00 PM" />
+        </label>
         <label>Phone
           <input type="tel" id="editPhone" />
         </label>
@@ -49,6 +52,9 @@
         </label>
         <label>Image URLs (comma separated)
           <input type="text" id="editImages" />
+        </label>
+        <label>Add Photos (upload)
+          <input type="file" id="editPhotosFiles" accept="image/*" multiple />
         </label>
         <button type="submit" class="btn btn-primary">Save</button>
       </form>
@@ -103,6 +109,7 @@
         document.getElementById('editAddress').value = temple.address || '';
         document.getElementById('editMapUrl').value = temple.mapUrl || '';
         document.getElementById('editImages').value = (temple.images || []).join(', ');
+        document.getElementById('editTimings').value = temple.timings || '';
       }
 
       function renderServices() {
@@ -140,15 +147,29 @@
         renderServices();
       });
 
-      document.getElementById('editTempleForm').addEventListener('submit', function (e) {
+      document.getElementById('editTempleForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const phone = document.getElementById('editPhone').value.trim();
         const email = document.getElementById('editEmail').value.trim();
         const address = document.getElementById('editAddress').value.trim();
         const mapUrl = document.getElementById('editMapUrl').value.trim();
         const imagesRaw = document.getElementById('editImages').value.trim();
-        const images = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
-        App.updateTemple(templeId, { phone, email, address, mapUrl, images });
+        const timings = document.getElementById('editTimings').value.trim();
+        const files = Array.from(document.getElementById('editPhotosFiles').files || []);
+
+        function readFilesAsDataUrls(files) {
+          return Promise.all(files.map(f => new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = reject;
+            fr.readAsDataURL(f);
+          })));
+        }
+        const uploaded = files.length ? await readFilesAsDataUrls(files) : [];
+        const urlList = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        const mergedImages = [...urlList, ...uploaded];
+
+        App.updateTemple(templeId, { phone, email, address, mapUrl, timings, images: mergedImages });
         Object.assign(temple, App.getTemples().find(t=>t.id===templeId));
         renderTemple();
       });

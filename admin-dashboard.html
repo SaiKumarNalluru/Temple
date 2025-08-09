@@ -40,6 +40,9 @@
         <label>Description
           <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
         </label>
+        <label>Timings
+          <input type="text" id="templeTimings" placeholder="e.g., 5:00 AM – 9:00 PM" />
+        </label>
         <div class="grid two">
           <label>Phone
             <input type="tel" id="templePhone" placeholder="e.g., +91 98765 43210" />
@@ -54,7 +57,10 @@
         <label>Google Map Link
           <input type="url" id="templeMapUrl" placeholder="https://maps.google.com/..." />
         </label>
-        <label>Image URLs (comma separated)
+        <label>Photos (upload)
+          <input type="file" id="templePhotosFiles" accept="image/*" multiple />
+        </label>
+        <label>Photo URLs (comma separated)
           <input type="text" id="templeImages" placeholder="https://...jpg, https://...png" />
         </label>
         <button type="submit" class="btn btn-primary">Add Temple</button>
@@ -88,6 +94,7 @@
         list.innerHTML = temples.map(t => {
           const count = services.filter(s => s.templeId === t.id).length;
           const cover = (t.images && t.images[0]) ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : '';
+          const tm = t.timings ? `<div class="small muted">🕒 ${t.timings}</div>` : '';
           return `
             <div class="list-item" data-id="${t.id}">
               <div>
@@ -96,6 +103,7 @@
                   <div>
                     <div><strong>${t.name}</strong></div>
                     <div class="small muted">${t.location} • ${count} services</div>
+                    ${tm}
                   </div>
                 </div>
               </div>
@@ -108,19 +116,34 @@
         }).join('');
       }
 
-      document.getElementById('addTempleForm').addEventListener('submit', function (e) {
+      document.getElementById('addTempleForm').addEventListener('submit', async function (e) {
         e.preventDefault();
         const name = document.getElementById('templeName').value.trim();
         const location = document.getElementById('templeLocation').value.trim();
         const description = document.getElementById('templeDescription').value.trim();
+        const timings = document.getElementById('templeTimings').value.trim();
         const phone = document.getElementById('templePhone').value.trim();
         const email = document.getElementById('templeEmail').value.trim();
         const address = document.getElementById('templeAddress').value.trim();
         const mapUrl = document.getElementById('templeMapUrl').value.trim();
         const imagesRaw = document.getElementById('templeImages').value.trim();
+        const files = Array.from(document.getElementById('templePhotosFiles').files || []);
         if (!name || !location) return;
-        const images = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
-        const temple = App.createTemple({ name, location, description, phone, email, address, mapUrl, images });
+
+        function readFilesAsDataUrls(files) {
+          return Promise.all(files.map(f => new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = reject;
+            fr.readAsDataURL(f);
+          })));
+        }
+
+        const uploaded = files.length ? await readFilesAsDataUrls(files) : [];
+        const urlList = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        const images = [...uploaded, ...urlList];
+
+        const temple = App.createTemple({ name, location, description, phone, email, address, mapUrl, images, timings });
         App.addTemple(temple);
         e.target.reset();
         renderList();

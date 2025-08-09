@@ -31,6 +31,7 @@
     <section class="card">
       <h2 id="templeTitle">Temple</h2>
       <div class="small muted" id="templeMeta"></div>
+      <div class="small" id="templeTimings"></div>
       <p id="templeDesc" class="small"></p>
       <div id="contactBlock" class="contact small"></div>
     </section>
@@ -88,6 +89,7 @@
         document.getElementById('templeTitle').textContent = temple.name;
         document.getElementById('templeMeta').textContent = temple.location;
         document.getElementById('templeDesc').textContent = temple.description || '';
+        document.getElementById('templeTimings').textContent = temple.timings ? `🕒 ${temple.timings}` : '';
         const c = [];
         if (temple.phone) c.push(`📞 <a href="tel:${temple.phone}">${temple.phone}</a>`);
         if (temple.email) c.push(`✉️ <a href="mailto:${temple.email}">${temple.email}</a>`);

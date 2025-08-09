@@ -38,8 +38,8 @@
     };
 
     const sampleTemples = [
-      { id: uniqueId("temple"), name: "Shri Venkateswara Temple", location: "Tirupati", description: "Famous temple with divine aura." },
-      { id: uniqueId("temple"), name: "Meenakshi Amman Temple", location: "Madurai", description: "Historic temple with stunning architecture." },
+      { id: uniqueId("temple"), name: "Shri Venkateswara Temple", location: "Tirupati", description: "Famous temple with divine aura.", timings: "5:00 AM – 9:00 PM" },
+      { id: uniqueId("temple"), name: "Meenakshi Amman Temple", location: "Madurai", description: "Historic temple with stunning architecture.", timings: "6:00 AM – 8:30 PM" },
     ];
 
     const sampleServices = [
@@ -65,9 +65,10 @@
   App.getBookings = () => readFromStorage("bookings", []);
   App.saveBookings = (bookings) => writeToStorage("bookings", bookings);
   App.uniqueId = uniqueId;
-  App.createTemple = ({ name, location, description, phone, email, address, mapUrl, images }) => ({
+  App.createTemple = ({ name, location, description, phone, email, address, mapUrl, images, timings }) => ({
     id: uniqueId('temple'), name, location, description: description || '',
-    phone: phone || '', email: email || '', address: address || '', mapUrl: mapUrl || '', images: Array.isArray(images) ? images : []
+    phone: phone || '', email: email || '', address: address || '', mapUrl: mapUrl || '', images: Array.isArray(images) ? images : [],
+    timings: timings || ''
   });
   App.addTemple = (temple) => { const all = App.getTemples(); all.push(temple); App.saveTemples(all); };
   App.updateTemple = (id, patch) => { const all = App.getTemples(); const i = all.findIndex(t=>t.id===id); if(i>=0){ all[i] = { ...all[i], ...patch }; App.saveTemples(all);} };
