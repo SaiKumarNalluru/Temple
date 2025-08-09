@@ -1,0 +1,13 @@
+{
+  "name": "psexec-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal web UI to run impacket psexec sequentially on multiple hosts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["psexec", "impacket", "remote", "command"],
+  "author": "",
+  "license": "MIT"
+}

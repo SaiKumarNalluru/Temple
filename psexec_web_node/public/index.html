@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PsExec Web</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+    label { display: block; margin: 12px 0 6px; font-weight: 600; }
+    input[type="text"], input[type="password"], textarea { width: 100%; max-width: 800px; padding: 8px; font-size: 14px; }
+    textarea { min-height: 120px; }
+    button { margin-top: 16px; padding: 10px 16px; font-size: 14px; cursor: pointer; }
+    .row { margin-bottom: 8px; }
+    pre { background: #111; color: #0f0; padding: 12px; overflow: auto; }
+    .result { border: 1px solid #ddd; padding: 12px; margin: 12px 0; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+  <h1>Execute Command on Remote Machines (PsExec)</h1>
+
+  <div class="row">
+    <label for="username">Username</label>
+    <input id="username" type="text" placeholder="e.g. Administrator" required>
+  </div>
+
+  <div class="row">
+    <label for="password">Password</label>
+    <input id="password" type="password" required>
+  </div>
+
+  <div class="row">
+    <label for="machines">List of machines</label>
+    <textarea id="machines" placeholder="Enter one per line, or comma-separated. e.g.:
+192.168.1.10
+192.168.1.11
+WIN-SERVER-01"></textarea>
+  </div>
+
+  <div class="row">
+    <label for="command">Command</label>
+    <input id="command" type="text" placeholder="e.g. ipconfig /all" required>
+  </div>
+
+  <button id="executeBtn">Execute</button>
+
+  <div id="status"></div>
+  <div id="results"></div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+
+    async function run() {
+      const username = el('username').value.trim();
+      const password = el('password').value;
+      const machines = el('machines').value;
+      const command = el('command').value.trim();
+
+      el('results').innerHTML = '';
+      el('status').textContent = '';
+
+      if (!username || !password || !command) {
+        el('status').innerHTML = '<span class="error">username, password, and command are required</span>';
+        return;
+      }
+
+      el('executeBtn').disabled = true;
+      el('status').textContent = 'Running...';
+
+      try {
+        const res = await fetch('/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, machines, command })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          el('status').innerHTML = `<span class=\"error\">Error: ${data.error || res.status}</span>`;
+        } else {
+          el('status').textContent = 'Done';
+          if (Array.isArray(data.results)) {
+            for (const item of data.results) {
+              const container = document.createElement('div');
+              container.className = 'result';
+              const header = document.createElement('div');
+              header.innerHTML = `<strong>Machine:</strong> ${item.machine} &nbsp; <strong>Exit:</strong> ${item.returncode === null ? 'N/A' : item.returncode}`;
+              const out = document.createElement('pre');
+              out.textContent = (item.stdout || '').trim();
+              const err = document.createElement('pre');
+              err.textContent = (item.stderr || '').trim();
+              container.appendChild(header);
+              if (out.textContent) { container.appendChild(out); }
+              if (err.textContent) { container.appendChild(err); }
+              el('results').appendChild(container);
+            }
+          }
+        }
+      } catch (e) {
+        el('status').innerHTML = `<span class=\"error\">${e}</span>`;
+      } finally {
+        el('executeBtn').disabled = false;
+      }
+    }
+
+    el('executeBtn').addEventListener('click', run);
+  </script>
+</body>
+</html>
