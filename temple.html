@@ -32,6 +32,17 @@
       <h2 id="templeTitle">Temple</h2>
       <div class="small muted" id="templeMeta"></div>
       <p id="templeDesc" class="small"></p>
+      <div id="contactBlock" class="contact small"></div>
+    </section>
+
+    <section class="card" id="mapSection" class="hidden">
+      <h3>Location</h3>
+      <div id="mapContainer"></div>
+    </section>
+
+    <section class="card" id="gallerySection" class="hidden">
+      <h3>Gallery</h3>
+      <div id="gallery" class="gallery"></div>
     </section>
 
     <section class="card">
@@ -77,6 +88,30 @@
         document.getElementById('templeTitle').textContent = temple.name;
         document.getElementById('templeMeta').textContent = temple.location;
         document.getElementById('templeDesc').textContent = temple.description || '';
+        const c = [];
+        if (temple.phone) c.push(`📞 <a href="tel:${temple.phone}">${temple.phone}</a>`);
+        if (temple.email) c.push(`✉️ <a href="mailto:${temple.email}">${temple.email}</a>`);
+        if (temple.address) c.push(`📍 ${temple.address}`);
+        document.getElementById('contactBlock').innerHTML = c.map(x=>`<div>${x}</div>`).join('');
+
+        const mapSection = document.getElementById('mapSection');
+        const mapContainer = document.getElementById('mapContainer');
+        if (temple.mapUrl) {
+          mapSection.classList.remove('hidden');
+          mapContainer.innerHTML = `<iframe class="map-embed" src="${temple.mapUrl}"></iframe>`;
+        } else {
+          mapSection.classList.add('hidden');
+        }
+
+        const gallerySection = document.getElementById('gallerySection');
+        const gallery = document.getElementById('gallery');
+        const imgs = Array.isArray(temple.images) ? temple.images : [];
+        if (imgs.length) {
+          gallerySection.classList.remove('hidden');
+          gallery.innerHTML = imgs.map(src => `<img src="${src}" alt="${temple.name} image"/>`).join('');
+        } else {
+          gallerySection.classList.add('hidden');
+        }
       }
 
       function renderServices() {

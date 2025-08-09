@@ -128,3 +128,12 @@ hr.sep { border: none; height: 1px; background: rgba(241,196,15,0.25); margin: 1
 .hero-subtitle { color: var(--muted); margin: 6px 0 0; }
 .tiles { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
 @media (max-width: 640px) { .tiles { grid-template-columns: 1fr; } }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+.gallery img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(241,196,15,0.25); background: rgba(255,255,255,0.06); }
+.tile-cover { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(241,196,15,0.25); background: rgba(255,255,255,0.06); }
+.contact { display: grid; gap: 6px; }
+.contact a { color: var(--gold); text-decoration: none; }
+.contact a:hover { text-decoration: underline; }
+.map-embed { width: 100%; height: 240px; border: 0; border-radius: 12px; }
+@media (max-width: 640px) { .gallery img { height: 100px; } .tile-cover { height: 120px; } }

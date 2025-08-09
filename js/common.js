@@ -65,6 +65,12 @@
   App.getBookings = () => readFromStorage("bookings", []);
   App.saveBookings = (bookings) => writeToStorage("bookings", bookings);
   App.uniqueId = uniqueId;
+  App.createTemple = ({ name, location, description, phone, email, address, mapUrl, images }) => ({
+    id: uniqueId('temple'), name, location, description: description || '',
+    phone: phone || '', email: email || '', address: address || '', mapUrl: mapUrl || '', images: Array.isArray(images) ? images : []
+  });
+  App.addTemple = (temple) => { const all = App.getTemples(); all.push(temple); App.saveTemples(all); };
+  App.updateTemple = (id, patch) => { const all = App.getTemples(); const i = all.findIndex(t=>t.id===id); if(i>=0){ all[i] = { ...all[i], ...patch }; App.saveTemples(all);} };
 
   // Auth
   function setCurrentUser(user) {

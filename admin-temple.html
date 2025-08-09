@@ -31,6 +31,27 @@
       <h2 id="templeTitle">Temple</h2>
       <div class="small muted" id="templeMeta"></div>
       <p id="templeDesc" class="small"></p>
+      <div id="contactBlock" class="contact small"></div>
+      <hr class="sep"/>
+      <h3>Edit Details</h3>
+      <form id="editTempleForm" class="form">
+        <label>Phone
+          <input type="tel" id="editPhone" />
+        </label>
+        <label>Email
+          <input type="email" id="editEmail" />
+        </label>
+        <label>Address
+          <input type="text" id="editAddress" />
+        </label>
+        <label>Google Map Link
+          <input type="url" id="editMapUrl" placeholder="Embed or share link" />
+        </label>
+        <label>Image URLs (comma separated)
+          <input type="text" id="editImages" />
+        </label>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
     </section>
 
     <section class="card">
@@ -72,6 +93,16 @@
         document.getElementById('templeTitle').textContent = temple.name;
         document.getElementById('templeMeta').textContent = temple.location;
         document.getElementById('templeDesc').textContent = temple.description || '';
+        const c = [];
+        if (temple.phone) c.push(`📞 <a href="tel:${temple.phone}">${temple.phone}</a>`);
+        if (temple.email) c.push(`✉️ <a href="mailto:${temple.email}">${temple.email}</a>`);
+        if (temple.address) c.push(`📍 ${temple.address}`);
+        document.getElementById('contactBlock').innerHTML = c.map(x=>`<div>${x}</div>`).join('');
+        document.getElementById('editPhone').value = temple.phone || '';
+        document.getElementById('editEmail').value = temple.email || '';
+        document.getElementById('editAddress').value = temple.address || '';
+        document.getElementById('editMapUrl').value = temple.mapUrl || '';
+        document.getElementById('editImages').value = (temple.images || []).join(', ');
       }
 
       function renderServices() {
@@ -107,6 +138,19 @@
         App.saveServices(App.getServices().filter(s => s.id !== id));
         App.saveBookings(App.getBookings().filter(b => b.serviceId !== id));
         renderServices();
+      });
+
+      document.getElementById('editTempleForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const phone = document.getElementById('editPhone').value.trim();
+        const email = document.getElementById('editEmail').value.trim();
+        const address = document.getElementById('editAddress').value.trim();
+        const mapUrl = document.getElementById('editMapUrl').value.trim();
+        const imagesRaw = document.getElementById('editImages').value.trim();
+        const images = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        App.updateTemple(templeId, { phone, email, address, mapUrl, images });
+        Object.assign(temple, App.getTemples().find(t=>t.id===templeId));
+        renderTemple();
       });
 
       renderTemple();

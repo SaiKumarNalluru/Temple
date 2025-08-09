@@ -40,6 +40,23 @@
         <label>Description
           <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
         </label>
+        <div class="grid two">
+          <label>Phone
+            <input type="tel" id="templePhone" placeholder="e.g., +91 98765 43210" />
+          </label>
+          <label>Email
+            <input type="email" id="templeEmail" placeholder="contact@temple.org" />
+          </label>
+        </div>
+        <label>Address
+          <input type="text" id="templeAddress" placeholder="Street, City, State" />
+        </label>
+        <label>Google Map Link
+          <input type="url" id="templeMapUrl" placeholder="https://maps.google.com/..." />
+        </label>
+        <label>Image URLs (comma separated)
+          <input type="text" id="templeImages" placeholder="https://...jpg, https://...png" />
+        </label>
         <button type="submit" class="btn btn-primary">Add Temple</button>
       </form>
     </section>
@@ -70,11 +87,17 @@
         }
         list.innerHTML = temples.map(t => {
           const count = services.filter(s => s.templeId === t.id).length;
+          const cover = (t.images && t.images[0]) ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : '';
           return `
             <div class="list-item" data-id="${t.id}">
               <div>
-                <div><strong>${t.name}</strong></div>
-                <div class="small muted">${t.location} • ${count} services</div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  ${cover}
+                  <div>
+                    <div><strong>${t.name}</strong></div>
+                    <div class="small muted">${t.location} • ${count} services</div>
+                  </div>
+                </div>
               </div>
               <div class="actions">
                 <a class="btn btn-secondary" href="/admin-temple.html?id=${t.id}">Manage</a>
@@ -90,10 +113,15 @@
         const name = document.getElementById('templeName').value.trim();
         const location = document.getElementById('templeLocation').value.trim();
         const description = document.getElementById('templeDescription').value.trim();
+        const phone = document.getElementById('templePhone').value.trim();
+        const email = document.getElementById('templeEmail').value.trim();
+        const address = document.getElementById('templeAddress').value.trim();
+        const mapUrl = document.getElementById('templeMapUrl').value.trim();
+        const imagesRaw = document.getElementById('templeImages').value.trim();
         if (!name || !location) return;
-        const temples = App.getTemples();
-        temples.push({ id: App.uniqueId('temple'), name, location, description });
-        App.saveTemples(temples);
+        const images = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        const temple = App.createTemple({ name, location, description, phone, email, address, mapUrl, images });
+        App.addTemple(temple);
         e.target.reset();
         renderList();
       });

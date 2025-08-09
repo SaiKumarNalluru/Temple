@@ -34,6 +34,7 @@
         <input type="search" id="searchInput" placeholder="Search by temple or location" />
         <button id="clearSearchBtn" class="btn btn-secondary">Clear</button>
       </div>
+      <div class="small muted">Tip: Admins can add contact, address, map and image gallery for each temple.</div>
     </section>
 
     <section class="card">
@@ -63,9 +64,15 @@
         }
         listEl.innerHTML = temples.map(t => `
           <div class="card-item">
+            ${t.images && t.images[0] ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : ''}
             <h4>${t.name}</h4>
             <div class="badge">${t.location}</div>
             <p class="small">${t.description || ''}</p>
+            <div class="contact small">
+              ${t.phone ? `<div class="badge">📞 ${t.phone}</div>` : ''}
+              ${t.email ? `<div class="badge">✉️ ${t.email}</div>` : ''}
+              ${t.address ? `<div>📍 ${t.address}</div>` : ''}
+            </div>
             <a class="btn btn-primary" href="/temple.html?id=${t.id}">Open</a>
           </div>
         `).join('');
