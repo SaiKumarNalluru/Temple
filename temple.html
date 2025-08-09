@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Temple • Temple Services</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
 </head>
 <body>
   <header class="app-header">
@@ -28,12 +29,20 @@
   </header>
 
   <main class="container stack">
+    <section class="hero-banner" id="templeHero" style="display:none;">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1 class="hero-title" id="heroTitle"></h1>
+        <p class="hero-subtitle" id="heroSubtitle"></p>
+      </div>
+    </section>
     <section class="card">
       <h2 id="templeTitle">Temple</h2>
       <div class="small muted" id="templeMeta"></div>
       <div class="small" id="templeTimings"></div>
       <p id="templeDesc" class="small"></p>
       <div id="contactBlock" class="contact small"></div>
+      <div class="chips" id="chipRow"></div>
     </section>
 
     <section class="card" id="mapSection" class="hidden">
@@ -77,6 +86,12 @@
     <div class="container">© <span id="yearSpan"></span> Temple Services</div>
   </footer>
 
+  <nav class="bottom-nav">
+    <a href="/index.html"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html" class="active"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+    <a href="/bookings.html" data-role="user-link" class="hidden"><span class="material-symbols-outlined">event</span><span class="small">Bookings</span></a>
+  </nav>
+
   <script src="/js/common.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -95,6 +110,21 @@
         if (temple.email) c.push(`✉️ <a href="mailto:${temple.email}">${temple.email}</a>`);
         if (temple.address) c.push(`📍 ${temple.address}`);
         document.getElementById('contactBlock').innerHTML = c.map(x=>`<div>${x}</div>`).join('');
+
+        const hero = document.getElementById('templeHero');
+        const heroTitle = document.getElementById('heroTitle');
+        const heroSubtitle = document.getElementById('heroSubtitle');
+        if (temple.images && temple.images[0]) {
+          hero.style.display = '';
+          hero.style.backgroundImage = `url('${temple.images[0]}')`;
+          heroTitle.textContent = temple.name;
+          heroSubtitle.textContent = temple.location;
+        }
+
+        const chips = [];
+        chips.push(`<span class="chip"><span class="material-symbols-outlined icon">location_on</span>${temple.location}</span>`);
+        if (temple.timings) chips.push(`<span class="chip"><span class="material-symbols-outlined icon">schedule</span>${temple.timings}</span>`);
+        document.getElementById('chipRow').innerHTML = chips.join('');
 
         const mapSection = document.getElementById('mapSection');
         const mapContainer = document.getElementById('mapContainer');
