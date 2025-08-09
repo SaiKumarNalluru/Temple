@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temples • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Find Temples</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+        <a href="/user-login.html">Login</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <div class="search-bar">
+        <input type="search" id="searchInput" placeholder="Search by temple or location" />
+        <button id="clearSearchBtn" class="btn btn-secondary">Clear</button>
+      </div>
+      <div class="small muted">Tip: Admins can add contact, address, map and image gallery for each temple.</div>
+    </section>
+
+    <section class="card">
+      <h2>Temples</h2>
+      <div id="templeList" class="grid two"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="/index.html"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html" class="active"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+    <a href="/bookings.html" data-role="user-link" class="hidden"><span class="material-symbols-outlined">event</span><span class="small">Bookings</span></a>
+    <a href="/admin-dashboard.html" data-role="admin-link" class="hidden"><span class="material-symbols-outlined">dashboard</span><span class="small">Admin</span></a>
+  </nav>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      const listEl = document.getElementById('templeList');
+      let q = '';
+
+      function render() {
+        const temples = App.getTemples().filter(t =>
+          t.name.toLowerCase().includes(q) || t.location.toLowerCase().includes(q)
+        );
+        if (temples.length === 0) {
+          listEl.innerHTML = '<div class="muted">No temples match your search.</div>';
+          return;
+        }
+        listEl.innerHTML = temples.map(t => {
+          const cover = (t.images && t.images[0]) ? t.images[0] : 'https://images.unsplash.com/photo-1604937455095-ef2c49188a1a?q=80&w=1200&auto=format&fit=crop';
+          return `
+            <div class="image-card">
+              <img class="image" src="${cover}" alt="${t.name} cover"/>
+              <div class="overlay"></div>
+              <div class="content">
+                <h4>${t.name}</h4>
+                <div class="chips">
+                  <span class="chip"><span class="material-symbols-outlined icon">location_on</span>${t.location}</span>
+                  ${t.timings ? `<span class="chip"><span class="material-symbols-outlined icon">schedule</span>${t.timings}</span>` : ''}
+                </div>
+                <div class="grid two">
+                  <a class="btn btn-primary" href="/temple.html?id=${t.id}">Open</a>
+                  <a class="btn btn-secondary" href="tel:${t.phone || ''}"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">call</span>Call</a>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('searchInput').addEventListener('input', function (e) {
+        q = e.target.value.trim().toLowerCase();
+        render();
+      });
+      document.getElementById('clearSearchBtn').addEventListener('click', function () {
+        q = ''; const i = document.getElementById('searchInput'); i.value=''; render();
+      });
+
+      render();
+    });
+  </script>
+</body>
+</html>

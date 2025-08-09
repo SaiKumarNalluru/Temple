@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Admin Portal</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/admin-dashboard.html" data-role="admin-link">Dashboard</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <h2>Add Temple</h2>
+      <form id="addTempleForm" class="form">
+        <label class="icon-input">Temple Name
+          <span class="material-symbols-outlined">temple_hindu</span>
+          <input type="text" id="templeName" placeholder="Temple name" required />
+        </label>
+        <label class="icon-input">Location
+          <span class="material-symbols-outlined">location_on</span>
+          <input type="text" id="templeLocation" placeholder="City, Area" required />
+        </label>
+        <label class="icon-input">Description
+          <span class="material-symbols-outlined">notes</span>
+          <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
+        </label>
+        <label class="icon-input">Timings
+          <span class="material-symbols-outlined">schedule</span>
+          <input type="text" id="templeTimings" placeholder="e.g., 5:00 AM – 9:00 PM" />
+        </label>
+        <div class="grid two">
+          <label class="icon-input">Phone
+            <span class="material-symbols-outlined">call</span>
+            <input type="tel" id="templePhone" placeholder="e.g., +91 98765 43210" />
+          </label>
+          <label class="icon-input">Email
+            <span class="material-symbols-outlined">mail</span>
+            <input type="email" id="templeEmail" placeholder="contact@temple.org" />
+          </label>
+        </div>
+        <label class="icon-input">Address
+          <span class="material-symbols-outlined">home_pin</span>
+          <input type="text" id="templeAddress" placeholder="Street, City, State" />
+        </label>
+        <label class="icon-input">Google Map Link
+          <span class="material-symbols-outlined">map</span>
+          <input type="url" id="templeMapUrl" placeholder="https://maps.google.com/..." />
+        </label>
+        <label>Photos (upload)
+          <input type="file" id="templePhotosFiles" accept="image/*" multiple />
+        </label>
+        <label class="icon-input">Photo URLs (comma separated)
+          <span class="material-symbols-outlined">add_link</span>
+          <input type="text" id="templeImages" placeholder="https://...jpg, https://...png" />
+        </label>
+        <button type="submit" class="btn btn-primary">Add Temple</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>All Temples</h2>
+      <div id="adminTempleList" class="list"></div>
+    </section>
+  </main>
+
+  <a class="fab" href="#addTempleForm"><span class="material-symbols-outlined">add</span></a>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      App.requireRole('admin');
+
+      function renderList() {
+        const temples = App.getTemples();
+        const services = App.getServices();
+        const list = document.getElementById('adminTempleList');
+        if (temples.length === 0) {
+          list.innerHTML = '<div class="muted">No temples yet. Add one above.</div>';
+          return;
+        }
+        list.innerHTML = temples.map(t => {
+          const count = services.filter(s => s.templeId === t.id).length;
+          const cover = (t.images && t.images[0]) ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : '';
+          const tm = t.timings ? `<div class="small muted">🕒 ${t.timings}</div>` : '';
+          return `
+            <div class="list-item hover-lift" data-id="${t.id}">
+              <div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  ${cover}
+                  <div>
+                    <div><strong>${t.name}</strong></div>
+                    <div class="small muted">${t.location} • ${count} services</div>
+                    ${tm}
+                  </div>
+                </div>
+              </div>
+              <div class="actions">
+                <a class="btn btn-secondary" href="/admin-temple.html?id=${t.id}">Manage</a>
+                <button class="btn btn-danger" data-action="delete">Delete</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('addTempleForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const name = document.getElementById('templeName').value.trim();
+        const location = document.getElementById('templeLocation').value.trim();
+        const description = document.getElementById('templeDescription').value.trim();
+        const timings = document.getElementById('templeTimings').value.trim();
+        const phone = document.getElementById('templePhone').value.trim();
+        const email = document.getElementById('templeEmail').value.trim();
+        const address = document.getElementById('templeAddress').value.trim();
+        const mapUrl = document.getElementById('templeMapUrl').value.trim();
+        const imagesRaw = document.getElementById('templeImages').value.trim();
+        const files = Array.from(document.getElementById('templePhotosFiles').files || []);
+        if (!name || !location) return;
+
+        function readFilesAsDataUrls(files) {
+          return Promise.all(files.map(f => new Promise((resolve, reject) => {
+            const fr = new FileReader();
+            fr.onload = () => resolve(fr.result);
+            fr.onerror = reject;
+            fr.readAsDataURL(f);
+          })));
+        }
+
+        const uploaded = files.length ? await readFilesAsDataUrls(files) : [];
+        const urlList = imagesRaw ? imagesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+        const images = [...uploaded, ...urlList];
+
+        const temple = App.createTemple({ name, location, description, phone, email, address, mapUrl, images, timings });
+        App.addTemple(temple);
+        e.target.reset();
+        renderList();
+      });
+
+      document.getElementById('adminTempleList').addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-action="delete"]');
+        if (!btn) return;
+        const item = btn.closest('.list-item');
+        const id = item.getAttribute('data-id');
+        if (!confirm('Delete this temple and its services/bookings?')) return;
+        const temples = App.getTemples().filter(t => t.id !== id);
+        App.saveTemples(temples);
+        App.saveServices(App.getServices().filter(s => s.templeId !== id));
+        App.saveBookings(App.getBookings().filter(b => b.templeId !== id));
+        renderList();
+      });
+
+      renderList();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Register • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Create Account</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/index.html">Home</a>
+        <a href="/user-login.html">Login</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Create Account</h2>
+      <form id="userRegisterForm" class="form" autocomplete="off">
+        <label>Full Name
+          <input type="text" id="registerName" placeholder="Your name" required />
+        </label>
+        <label>Email
+          <input type="email" id="registerEmail" placeholder="you@example.com" required />
+        </label>
+        <label>Password
+          <input type="password" id="registerPassword" placeholder="Min 6 characters" minlength="6" required />
+        </label>
+        <button type="submit" class="btn btn-primary">Create Account</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <nav class="bottom-nav">
+    <a href="/index.html"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html" class="active"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+  </nav>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      const form = document.getElementById('userRegisterForm');
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = document.getElementById('registerName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+        const password = document.getElementById('registerPassword').value;
+        if (password.length < 6) return alert('Password must be at least 6 characters.');
+        const users = App.getUsers();
+        if (users.some(u => u.email.toLowerCase() === email)) return alert('Email already registered.');
+        users.push({ id: App.uniqueId('user'), name, email, password, role: 'user' });
+        App.saveUsers(users);
+        alert('Account created. You can now log in.');
+        window.location.href = '/user-login.html';
+      });
+    });
+  </script>
+</body>
+</html>

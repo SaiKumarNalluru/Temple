@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Bookings • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">My Bookings</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/temples.html">Temples</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="card">
+      <h2>Booking History</h2>
+      <div id="bookingHistory" class="list"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <nav class="bottom-nav">
+    <a href="/index.html"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+    <a href="/bookings.html" class="active"><span class="material-symbols-outlined">event</span><span class="small">Bookings</span></a>
+  </nav>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      App.requireRole('user');
+
+      function renderHistory() {
+        const user = App.getCurrentUser();
+        const bookings = App.getBookings().filter(b => b.userId === user.id).sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+        const temples = App.getTemples();
+        const services = App.getServices();
+        const container = document.getElementById('bookingHistory');
+        if (bookings.length === 0) { container.innerHTML = '<div class="muted">No bookings yet.</div>'; return; }
+        container.innerHTML = bookings.map(b => {
+          const temple = temples.find(t => t.id === b.templeId);
+          const service = services.find(s => s.id === b.serviceId);
+          const name = service ? service.name : 'Service';
+          const amount = service ? `₹${service.amount.toFixed(2)}` : '-';
+          return `
+            <div class="list-item hover-lift" data-id="${b.id}">
+              <div>
+                <div><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">local_activity</span><strong>${name}</strong> at ${temple ? temple.name : 'Temple'}</div>
+                <div class="small muted"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:4px;">event</span>${b.date} • ${b.time} • ${amount}</div>
+              </div>
+              <div class="actions">
+                <span class="badge">${b.status}</span>
+                <button class="btn btn-ghost" data-action="cancel"><span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span></button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('bookingHistory').addEventListener('click', function (e) {
+        const btn = e.target.closest('button[data-action="cancel"]');
+        if (!btn) return;
+        const id = btn.closest('.list-item').getAttribute('data-id');
+        if (!confirm('Cancel this booking?')) return;
+        App.saveBookings(App.getBookings().filter(b => b.id !== id));
+        renderHistory();
+      });
+
+      renderHistory();
+    });
+  </script>
+</body>
+</html>

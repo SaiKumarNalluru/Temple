@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Devotional bookings made simple</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/temples.html">Temples</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+        <a href="/admin-dashboard.html" data-role="admin-link" class="hidden">Admin</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="hero-banner" style="background-image: url('https://images.unsplash.com/photo-1604937455095-ef2c49188a1a?q=80&w=1600&auto=format&fit=crop');">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1 class="hero-title">Experience the Divine, Seamlessly</h1>
+        <p class="hero-subtitle">Search temples, explore services, and book your seva with a few taps.</p>
+        <div class="grid two" style="margin-top:10px;">
+          <a class="btn btn-primary" href="/temples.html"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">temple_hindu</span>Find Temples</a>
+          <a class="btn btn-secondary" href="/user-login.html"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">login</span>Login</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="tiles">
+      <div class="card">
+        <h3><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">self_improvement</span>For Devotees</h3>
+        <p class="muted">Search temples, view services and book a time slot. Access your booking history anytime.</p>
+        <div class="grid two">
+          <a class="btn btn-primary" href="/temples.html">Find Temples</a>
+          <a class="btn btn-secondary" href="/user-login.html">Login</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">admin_panel_settings</span>For Admin</h3>
+        <p class="muted">Add temples and define services with amounts. Manage bookings and services.</p>
+        <div class="grid two">
+          <a class="btn btn-primary" href="/admin-login.html">Admin Login</a>
+          <a class="btn btn-secondary" href="/admin-dashboard.html">Dashboard</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="/index.html" class="active"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+    <a href="/bookings.html" data-role="user-link" class="hidden"><span class="material-symbols-outlined">event</span><span class="small">Bookings</span></a>
+    <a href="/admin-dashboard.html" data-role="admin-link" class="hidden"><span class="material-symbols-outlined">dashboard</span><span class="small">Admin</span></a>
+  </nav>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+</body>
+</html>

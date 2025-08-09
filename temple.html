@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Temple • Temple Services</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner container">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🛕</div>
+        <div class="brand-text">
+          <div class="brand-title">Temple Services</div>
+          <div class="brand-subtitle">Temple Details</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="/temples.html">Back to Temples</a>
+        <a href="/bookings.html" data-role="user-link" class="hidden">My Bookings</a>
+      </nav>
+      <div class="user-actions">
+        <div id="currentUserInfo" class="current-user" aria-live="polite"></div>
+        <button id="logoutBtn" class="btn btn-secondary" hidden>Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container stack">
+    <section class="hero-banner" id="templeHero" style="display:none;">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h1 class="hero-title" id="heroTitle"></h1>
+        <p class="hero-subtitle" id="heroSubtitle"></p>
+      </div>
+    </section>
+    <section class="card">
+      <h2 id="templeTitle">Temple</h2>
+      <div class="small muted" id="templeMeta"></div>
+      <div class="small" id="templeTimings"></div>
+      <p id="templeDesc" class="small"></p>
+      <div id="contactBlock" class="contact small"></div>
+      <div class="chips" id="chipRow"></div>
+    </section>
+
+    <section class="card" id="mapSection" class="hidden">
+      <h3>Location</h3>
+      <div id="mapContainer"></div>
+    </section>
+
+    <section class="card" id="gallerySection" class="hidden">
+      <h3>Gallery</h3>
+      <div id="gallery" class="gallery"></div>
+    </section>
+
+    <section class="card">
+      <h3>Services</h3>
+      <div id="servicesList" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h3>Book a Service</h3>
+      <form id="bookingForm" class="form">
+        <label>Service
+          <select id="bookingService" required>
+            <option value="" disabled selected>Select a service</option>
+          </select>
+        </label>
+        <div class="grid two">
+          <label>Date
+            <input type="date" id="bookingDate" required />
+          </label>
+          <label>Time
+            <input type="time" id="bookingTime" required />
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Book</button>
+      </form>
+      <div class="small muted">Login required to book.</div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">© <span id="yearSpan"></span> Temple Services</div>
+  </footer>
+
+  <nav class="bottom-nav">
+    <a href="/index.html"><span class="material-symbols-outlined">home</span><span class="small">Home</span></a>
+    <a href="/temples.html" class="active"><span class="material-symbols-outlined">temple_hindu</span><span class="small">Temples</span></a>
+    <a href="/bookings.html" data-role="user-link" class="hidden"><span class="material-symbols-outlined">event</span><span class="small">Bookings</span></a>
+  </nav>
+
+  <script src="/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const App = window.TempleApp;
+      const templeId = App.getQueryParam('id');
+      const temple = App.getTemples().find(t => t.id === templeId);
+      if (!temple) { window.location.href = '/temples.html'; return; }
+
+      function renderTemple() {
+        document.getElementById('templeTitle').textContent = temple.name;
+        document.getElementById('templeMeta').textContent = temple.location;
+        document.getElementById('templeDesc').textContent = temple.description || '';
+        document.getElementById('templeTimings').textContent = temple.timings ? `🕒 ${temple.timings}` : '';
+        const c = [];
+        if (temple.phone) c.push(`📞 <a href="tel:${temple.phone}">${temple.phone}</a>`);
+        if (temple.email) c.push(`✉️ <a href="mailto:${temple.email}">${temple.email}</a>`);
+        if (temple.address) c.push(`📍 ${temple.address}`);
+        document.getElementById('contactBlock').innerHTML = c.map(x=>`<div>${x}</div>`).join('');
+
+        const hero = document.getElementById('templeHero');
+        const heroTitle = document.getElementById('heroTitle');
+        const heroSubtitle = document.getElementById('heroSubtitle');
+        if (temple.images && temple.images[0]) {
+          hero.style.display = '';
+          hero.style.backgroundImage = `url('${temple.images[0]}')`;
+          heroTitle.textContent = temple.name;
+          heroSubtitle.textContent = temple.location;
+        }
+
+        const chips = [];
+        chips.push(`<span class="chip"><span class="material-symbols-outlined icon">location_on</span>${temple.location}</span>`);
+        if (temple.timings) chips.push(`<span class="chip"><span class="material-symbols-outlined icon">schedule</span>${temple.timings}</span>`);
+        document.getElementById('chipRow').innerHTML = chips.join('');
+
+        const mapSection = document.getElementById('mapSection');
+        const mapContainer = document.getElementById('mapContainer');
+        if (temple.mapUrl) {
+          mapSection.classList.remove('hidden');
+          mapContainer.innerHTML = `<iframe class="map-embed" src="${temple.mapUrl}"></iframe>`;
+        } else {
+          mapSection.classList.add('hidden');
+        }
+
+        const gallerySection = document.getElementById('gallerySection');
+        const gallery = document.getElementById('gallery');
+        const imgs = Array.isArray(temple.images) ? temple.images : [];
+        if (imgs.length) {
+          gallerySection.classList.remove('hidden');
+          gallery.innerHTML = imgs.map(src => `<img src="${src}" alt="${temple.name} image"/>`).join('');
+        } else {
+          gallerySection.classList.add('hidden');
+        }
+      }
+
+      function renderServices() {
+        const list = document.getElementById('servicesList');
+        const select = document.getElementById('bookingService');
+        const services = App.getServices().filter(s => s.templeId === templeId);
+        if (services.length === 0) {
+          list.innerHTML = '<div class="muted">No services available.</div>';
+          select.innerHTML = '<option value="" disabled selected>No services</option>';
+          return;
+        }
+        list.innerHTML = services.map(s => `
+          <div class="service-row"><span>${s.name}</span><span class="price">₹${s.amount.toFixed(2)}</span></div>
+        `).join('');
+        select.innerHTML = '<option value="" disabled selected>Select a service</option>' + services.map(s => `<option value="${s.id}">${s.name} — ₹${s.amount.toFixed(2)}</option>`).join('');
+      }
+
+      function handleBooking(e) {
+        e.preventDefault();
+        const user = App.getCurrentUser();
+        if (!user || user.role !== 'user') return alert('Please login as a user to book.');
+        const serviceId = document.getElementById('bookingService').value;
+        const date = document.getElementById('bookingDate').value;
+        const time = document.getElementById('bookingTime').value;
+        if (!serviceId || !date || !time) return;
+        const bookings = App.getBookings();
+        if (bookings.some(b => b.userId === user.id && b.serviceId === serviceId && b.date === date && b.time === time)) {
+          return alert('You already booked this service at the same time.');
+        }
+        bookings.push({ id: App.uniqueId('booking'), userId: user.id, templeId, serviceId, date, time, status: 'CONFIRMED', createdAt: new Date().toISOString() });
+        App.saveBookings(bookings);
+        alert('Booking confirmed.');
+        window.location.href = '/bookings.html';
+      }
+
+      document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+
+      renderTemple();
+      renderServices();
+    });
+  </script>
+</body>
+</html>
