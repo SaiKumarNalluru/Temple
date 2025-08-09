@@ -128,3 +128,14 @@ hr.sep { border: none; height: 1px; background: rgba(31,200,166,0.3); margin: 10
 .bottom-nav a.active, .bottom-nav a:hover { background: rgba(31,200,166,0.18); border: 1px solid rgba(31,200,166,0.35); }
 .bottom-nav .material-symbols-outlined { font-size: 20px; }
 @media (min-width: 1024px) { .bottom-nav { display: none; } }
+
+/* Advanced visuals */
+.hover-lift { transition: transform 200ms ease, box-shadow 200ms ease; }
+.hover-lift:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,0.35); }
+.glass { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); backdrop-filter: blur(10px); }
+.icon-input { position: relative; }
+.icon-input .material-symbols-outlined { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.icon-input input, .icon-input textarea, .icon-input select { padding-left: 40px; }
+.ribbon { position: absolute; top: 10px; left: 10px; background: rgba(31,200,166,0.9); color: #052e2a; padding: 6px 10px; border-radius: 999px; font-size: 12px; border: 1px solid rgba(31,200,166,0.35); }
+.fab { position: fixed; right: 18px; bottom: 80px; z-index: 25; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-600)); color: #052e2a; box-shadow: 0 14px 40px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12); }
+.fab:hover { filter: brightness(1.05); }

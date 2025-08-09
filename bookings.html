@@ -60,15 +60,17 @@
         container.innerHTML = bookings.map(b => {
           const temple = temples.find(t => t.id === b.templeId);
           const service = services.find(s => s.id === b.serviceId);
+          const name = service ? service.name : 'Service';
+          const amount = service ? `₹${service.amount.toFixed(2)}` : '-';
           return `
-            <div class="list-item" data-id="${b.id}">
+            <div class="list-item hover-lift" data-id="${b.id}">
               <div>
-                <div><strong>${service ? service.name : 'Service'}</strong> at ${temple ? temple.name : 'Temple'}</div>
-                <div class="small muted">${b.date} • ${b.time} • ₹${service ? service.amount.toFixed(2) : '-'}</div>
+                <div><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:6px;">local_activity</span><strong>${name}</strong> at ${temple ? temple.name : 'Temple'}</div>
+                <div class="small muted"><span class="material-symbols-outlined" style="vertical-align: middle; margin-right:4px;">event</span>${b.date} • ${b.time} • ${amount}</div>
               </div>
               <div class="actions">
                 <span class="badge">${b.status}</span>
-                <button class="btn btn-ghost" data-action="cancel">Cancel</button>
+                <button class="btn btn-ghost" data-action="cancel"><span class="material-symbols-outlined" style="vertical-align: middle;">cancel</span></button>
               </div>
             </div>
           `;

@@ -28,7 +28,7 @@
   </header>
 
   <main class="container stack">
-    <section class="card">
+    <section class="card hover-lift">
       <h2 id="templeTitle">Temple</h2>
       <div class="small muted" id="templeMeta"></div>
       <p id="templeDesc" class="small"></p>
@@ -36,22 +36,28 @@
       <hr class="sep"/>
       <h3>Edit Details</h3>
       <form id="editTempleForm" class="form">
-        <label>Timings
+        <label class="icon-input">Timings
+          <span class="material-symbols-outlined">schedule</span>
           <input type="text" id="editTimings" placeholder="e.g., 5:00 AM – 9:00 PM" />
         </label>
-        <label>Phone
+        <label class="icon-input">Phone
+          <span class="material-symbols-outlined">call</span>
           <input type="tel" id="editPhone" />
         </label>
-        <label>Email
+        <label class="icon-input">Email
+          <span class="material-symbols-outlined">mail</span>
           <input type="email" id="editEmail" />
         </label>
-        <label>Address
+        <label class="icon-input">Address
+          <span class="material-symbols-outlined">home_pin</span>
           <input type="text" id="editAddress" />
         </label>
-        <label>Google Map Link
+        <label class="icon-input">Google Map Link
+          <span class="material-symbols-outlined">map</span>
           <input type="url" id="editMapUrl" placeholder="Embed or share link" />
         </label>
-        <label>Image URLs (comma separated)
+        <label class="icon-input">Image URLs (comma separated)
+          <span class="material-symbols-outlined">add_link</span>
           <input type="text" id="editImages" />
         </label>
         <label>Add Photos (upload)
@@ -76,7 +82,7 @@
       </form>
     </section>
 
-    <section class="card">
+    <section class="card hover-lift">
       <h3>Services</h3>
       <div id="serviceList" class="list"></div>
     </section>

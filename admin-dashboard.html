@@ -32,36 +32,45 @@
     <section class="card">
       <h2>Add Temple</h2>
       <form id="addTempleForm" class="form">
-        <label>Temple Name
+        <label class="icon-input">Temple Name
+          <span class="material-symbols-outlined">temple_hindu</span>
           <input type="text" id="templeName" placeholder="Temple name" required />
         </label>
-        <label>Location
+        <label class="icon-input">Location
+          <span class="material-symbols-outlined">location_on</span>
           <input type="text" id="templeLocation" placeholder="City, Area" required />
         </label>
-        <label>Description
+        <label class="icon-input">Description
+          <span class="material-symbols-outlined">notes</span>
           <textarea id="templeDescription" rows="3" placeholder="Short description"></textarea>
         </label>
-        <label>Timings
+        <label class="icon-input">Timings
+          <span class="material-symbols-outlined">schedule</span>
           <input type="text" id="templeTimings" placeholder="e.g., 5:00 AM – 9:00 PM" />
         </label>
         <div class="grid two">
-          <label>Phone
+          <label class="icon-input">Phone
+            <span class="material-symbols-outlined">call</span>
             <input type="tel" id="templePhone" placeholder="e.g., +91 98765 43210" />
           </label>
-          <label>Email
+          <label class="icon-input">Email
+            <span class="material-symbols-outlined">mail</span>
             <input type="email" id="templeEmail" placeholder="contact@temple.org" />
           </label>
         </div>
-        <label>Address
+        <label class="icon-input">Address
+          <span class="material-symbols-outlined">home_pin</span>
           <input type="text" id="templeAddress" placeholder="Street, City, State" />
         </label>
-        <label>Google Map Link
+        <label class="icon-input">Google Map Link
+          <span class="material-symbols-outlined">map</span>
           <input type="url" id="templeMapUrl" placeholder="https://maps.google.com/..." />
         </label>
         <label>Photos (upload)
           <input type="file" id="templePhotosFiles" accept="image/*" multiple />
         </label>
-        <label>Photo URLs (comma separated)
+        <label class="icon-input">Photo URLs (comma separated)
+          <span class="material-symbols-outlined">add_link</span>
           <input type="text" id="templeImages" placeholder="https://...jpg, https://...png" />
         </label>
         <button type="submit" class="btn btn-primary">Add Temple</button>
@@ -73,6 +82,8 @@
       <div id="adminTempleList" class="list"></div>
     </section>
   </main>
+
+  <a class="fab" href="#addTempleForm"><span class="material-symbols-outlined">add</span></a>
 
   <footer class="app-footer">
     <div class="container">© <span id="yearSpan"></span> Temple Services</div>
@@ -97,7 +108,7 @@
           const cover = (t.images && t.images[0]) ? `<img class="tile-cover" src="${t.images[0]}" alt="${t.name} cover"/>` : '';
           const tm = t.timings ? `<div class="small muted">🕒 ${t.timings}</div>` : '';
           return `
-            <div class="list-item" data-id="${t.id}">
+            <div class="list-item hover-lift" data-id="${t.id}">
               <div>
                 <div style="display:flex; gap:10px; align-items:center;">
                   ${cover}
